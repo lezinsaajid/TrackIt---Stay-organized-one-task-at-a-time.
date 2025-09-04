@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrackIt – Stay organized, one task at a time.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="manifest"
+        href="data:application/json;base64,eyJuYW1lIjoiVGFza01hc3RlciBQcm8iLCJzaG9ydF9uYW1lIjoiVGFza01hc3RlciIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZmZmZmZmIiwidGhlbWVfY29sb3IiOiIjZmJiZjI0IiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjNhV1IwYUQwaU1qUWlJR2hsYVdkb2REMGlNalFpSUhabGNuTnBiMjQ5SWpFdU1TSWdlRzFzYm5NOUltaDBkSEE2THk5M2QzY3Vkek11YjNKbkx6SXdNREF2YzNabklqNDhjR0YwYUNCa1BTSk5NVElnTWtNMkxqVXlOaUF5SURJZ05pNDFNalpoTlRBZ05UQWdNQ0F4TURBZ01UQWdNVEJhVFRJeUlERXlZekFnTWkwNElEQWdOQzA0SURoMk5HRTRJRGdnTUNBd0lEQWdNVFlnTUhvaUlHWnBiR3c5SWlObVltSm1NalFpTHo0OEwzTjJaejQ9IiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJzaXplcyI6IjI0eDI0In1dfQ==">
+    <style>
+        /* ===== LIGHT YELLOW & WHITE THEME ===== */
+        :root {
+            /* Primary yellow theme colors */
+            --primary-color: #fbbf24;
+            /* Bright yellow */
+            --primary-light: #fef3c7;
+            /* Very light yellow */
+            --primary-dark: #f59e0b;
+            /* Darker yellow */
+
+            /* Background colors */
+            --bg-primary: #ffffff;
+            /* Pure white */
+            --bg-secondary: #fffbeb;
+            /* Cream white */
+            --bg-yellow: #fef3c7;
+            /* Light yellow background */
+
+            /* Text colors */
+            --text-primary: #1f2937;
+            /* Dark gray text */
+            --text-secondary: #6b7280;
+            /* Medium gray text */
+            --text-muted: #9ca3af;
+            /* Light gray text */
+
+            /* Status colors */
+            --success-color: #10b981;
+            /* Green for completed */
+            --danger-color: #ef4444;
+            /* Red for overdue */
+            --warning-color: #f59e0b;
+            /* Orange for due soon */
+
+            /* Priority colors */
+            --priority-low: #10b981;
+            /* Green */
+            --priority-medium: #f59e0b;
+            /* Yellow */
+            --priority-high: #ef4444;
+            /* Red */
+
+            /* Category colors */
+            --category-work: #3b82f6;
+            /* Blue */
+            --category-personal: #8b5cf6;
+            /* Purple */
+            --category-study: #06b6d4;
+            /* Cyan */
+
+            /* Border and shadow */
+            --border-color: #e5e7eb;
+            /* Light gray border */
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dark mode colors */
+        [data-theme="dark"] {
+            --bg-primary: #1f2937;
+            --bg-secondary: #374151;
+            --bg-yellow: #451a03;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --text-muted: #9ca3af;
+            --border-color: #4b5563;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Custom animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .fade-out {
+            animation: fadeOut 0.3s ease-out;
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Drag and drop styles */
+        .dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+
+        .drag-over {
+            border: 2px dashed var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        /* Progress bar animation */
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* Button hover effects */
+        .btn-hover {
+            transition: all 0.2s ease;
+        }
+
+        .btn-hover:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        /* Task card styles */
+        .task-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px var(--shadow-color);
+        }
+
+        .task-card.completed {
+            opacity: 0.7;
+        }
+
+        .task-card.overdue {
+            border-left-color: var(--danger-color);
+            background-color: #fef2f2;
+        }
+
+        [data-theme="dark"] .task-card.overdue {
+            background-color: #450a0a;
+        }
+
+        .task-card.due-soon {
+            border-left-color: var(--warning-color);
+            background-color: #fffbeb;
+        }
+
+        [data-theme="dark"] .task-card.due-soon {
+            background-color: #451a03;
+        }
+
+        /* Priority badges */
+        .priority-low {
+            background-color: var(--priority-low);
+        }
+
+        .priority-medium {
+            background-color: var(--priority-medium);
+        }
+
+        .priority-high {
+            background-color: var(--priority-high);
+        }
+
+        /* Category badges */
+        .category-work {
+            background-color: var(--category-work);
+        }
+
+        .category-personal {
+            background-color: var(--category-personal);
+        }
+
+        .category-study {
+            background-color: var(--category-study);
+        }
+
+        /* Modal styles */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Search highlight */
+        .search-highlight {
+            background-color: var(--primary-light);
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .task-card {
+                margin-bottom: 0.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body style="background-color: var(--bg-primary); color: var(--text-primary); transition: all 0.3s ease;">
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 shadow-lg"
+        style="background-color: var(--bg-primary); border-bottom: 1px solid var(--border-color);">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo and Title -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center">
+                        <img src="A minimalist logo for a to-do app named _TrackIt_. The design features clean lines and a modern aesthetic, incorporating a color palette of light yellow, white, and a subtle touch of light green. The logo should evoke a sense of organization and eff 2.jpg"
+                            alt="icon" class="w-10 h-10 rounded-lg">
+                    </div>
+
+
+                    <div>
+                        <h1 class="text-2xl font-bold" style="color: var(--text-primary);">TrackIt</h1>
+                        <p class="text-sm" style="color: var(--text-secondary);">Stay organized, one task at a time.</p>
+                    </div>
+                </div>
+
+                <!-- User and Controls -->
+                <div class="flex items-center space-x-4">
+                    <!-- User Info -->
+                    <div class="hidden md:flex items-center space-x-2 px-3 py-2 rounded-lg"
+                        style="background-color: var(--bg-secondary);">
+                        <span class="text-lg">👤</span>
+                        <span id="current-user" class="font-medium" style="color: var(--text-primary);">Guest
+                            User</span>
+                    </div>
+
+                    <!-- Dark Mode Toggle -->
+                    <button id="theme-toggle" class="p-2 rounded-lg btn-hover"
+                        style="background-color: var(--bg-secondary);">
+                        <span id="theme-icon" class="text-xl">🌙</span>
+                    </button>
+
+                    <!-- User Menu -->
+                    <button id="user-menu-btn" class="p-2 rounded-lg btn-hover"
+                        style="background-color: var(--primary-color);">
+                        <span class="text-xl">⚙️</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl mx-auto px-4 py-6">
+
+        <!-- Stats Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 stats-grid">
+            <!-- Total Tasks -->
+            <div class="p-4 rounded-xl shadow-sm"
+                style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium" style="color: var(--text-secondary);">Total Tasks</p>
+                        <p id="total-count" class="text-2xl font-bold" style="color: var(--text-primary);">0</p>
+                    </div>
+                    <span class="text-2xl">📋</span>
+                </div>
+            </div>
+
+            <!-- Completed Tasks -->
+            <div class="p-4 rounded-xl shadow-sm"
+                style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium" style="color: var(--text-secondary);">Completed</p>
+                        <p id="completed-count" class="text-2xl font-bold" style="color: var(--success-color);">0</p>
+                    </div>
+                    <span class="text-2xl">✅</span>
+                </div>
+            </div>
+
+            <!-- Pending Tasks -->
+            <div class="p-4 rounded-xl shadow-sm"
+                style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium" style="color: var(--text-secondary);">Pending</p>
+                        <p id="pending-count" class="text-2xl font-bold" style="color: var(--warning-color);">0</p>
+                    </div>
+                    <span class="text-2xl">⏳</span>
+                </div>
+            </div>
+
+            <!-- Overdue Tasks -->
+            <div class="p-4 rounded-xl shadow-sm"
+                style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium" style="color: var(--text-secondary);">Overdue</p>
+                        <p id="overdue-count" class="text-2xl font-bold" style="color: var(--danger-color);">0</p>
+                    </div>
+                    <span class="text-2xl">🚨</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mb-6 p-4 rounded-xl shadow-sm"
+            style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+            <div class="flex items-center justify-between mb-2">
+                <span class="font-medium" style="color: var(--text-primary);">Overall Progress</span>
+                <span id="progress-percentage" class="font-bold" style="color: var(--primary-color);">0%</span>
+            </div>
+            <div class="w-full rounded-full h-3" style="background-color: var(--border-color);">
+                <div id="progress-bar" class="progress-bar h-3 rounded-full"
+                    style="background-color: var(--primary-color); width: 0%;"></div>
+            </div>
+        </div>
+
+        <!-- Controls Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+            <!-- Add Task Form -->
+            <div class="lg:col-span-2 p-6 rounded-xl shadow-sm"
+                style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                <h2 class="text-xl font-bold mb-4 flex items-center" style="color: var(--text-primary);">
+                    <span class="mr-2">➕</span> Add New Task
+                </h2>
+
+                <form id="task-form" class="space-y-4">
+                    <!-- Task Title -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--text-secondary);">Task
+                            Title</label>
+                        <input type="text" id="task-title" required
+                            class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:border-transparent transition-all"
+                            style="background-color: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary); --tw-ring-color: var(--primary-color);"
+                            placeholder="Enter your task...">
+                    </div>
+
+                    <!-- Task Description -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--text-secondary);">Description
+                            (Optional)</label>
+                        <textarea id="task-description" rows="2"
+                            class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:border-transparent transition-all"
+                            style="background-color: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary); --tw-ring-color: var(--primary-color);"
+                            placeholder="Add more details..."></textarea>
+                    </div>
+
+                    <!-- Row 1: Priority and Category -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Priority -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2"
+                                style="color: var(--text-secondary);">Priority</label>
+                            <select id="task-priority"
+                                class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:border-transparent transition-all"
+                                style="background-color: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary); --tw-ring-color: var(--primary-color);">
+                                <option value="low">🟢 Low Priority</option>
+                                <option value="medium" selected>🟡 Medium Priority</option>
+                                <option value="high">🔴 High Priority</option>
+                            </select>
+                        </div>
+
+                        <!-- Category -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2"
+                                style="color: var(--text-secondary);">Category</label>
+                            <select id="task-category"
+                                class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:border-transparent transition-all"
+                                style="background-color: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary); --tw-ring-color: var(--primary-color);">
+                                <option value="work">💼 Work</option>
+                                <option value="personal" selected>🏠 Personal</option>
+                                <option value="study">📚 Study</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Due Date -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--text-secondary);">Due
+                            Date</label>
+                        <input type="datetime-local" id="task-due-date"
+                            class="w-full px-4 py-3 rounded-lg border focus:ring-2 focus:border-transparent transition-all"
+                            style="background-color: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary); --tw-ring-color: var(--primary-color);">
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="w-full py-3 px-6 rounded-lg font-semibold btn-hover transition-all"
+                        style="background-color: var(--primary-color); color: var(--text-primary);">
+                        <span class="mr-2">➕</span> Add Task
+                    </button>
+                </form>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="space-y-4">
+
+                <!-- Search and Filter -->
+                <div class="p-4 rounded-xl shadow-sm"
+                    style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                    <h3 class="font-bold mb-3 flex items-center" style="color: var(--text-primary);">
+                        <span class="mr-2">🔍</span> Search & Filter
+                    </h3>
+
+                    <!-- Search Bar -->
+                    <div class="mb-3">
+                        <input type="text" id="search-input"
+                            class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:border-transparent transition-all"
+                            style="background-color: var(--bg-primary); border-color: var(--border-color); color: var(--text-primary); --tw-ring-color: var(--primary-color);"
+                            placeholder="Search tasks...">
+                    </div>
+
+                    <!-- Filter Buttons -->
+                    <div class="space-y-2">
+                        <button id="filter-all"
+                            class="filter-btn w-full py-2 px-3 rounded-lg text-sm font-medium transition-all"
+                            style="background-color: var(--primary-color); color: var(--text-primary);">
+                            📋 All Tasks
+                        </button>
+                        <button id="filter-pending"
+                            class="filter-btn w-full py-2 px-3 rounded-lg text-sm font-medium transition-all"
+                            style="background-color: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--border-color);">
+                            ⏳ Pending
+                        </button>
+                        <button id="filter-completed"
+                            class="filter-btn w-full py-2 px-3 rounded-lg text-sm font-medium transition-all"
+                            style="background-color: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--border-color);">
+                            ✅ Completed
+                        </button>
+                        <button id="filter-overdue"
+                            class="filter-btn w-full py-2 px-3 rounded-lg text-sm font-medium transition-all"
+                            style="background-color: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--border-color);">
+                            🚨 Overdue
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="p-4 rounded-xl shadow-sm"
+                    style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+                    <h3 class="font-bold mb-3 flex items-center" style="color: var(--text-primary);">
+                        <span class="mr-2">⚡</span> Quick Actions
+                    </h3>
+
+                    <div class="space-y-2">
+                        <button id="clear-completed"
+                            class="w-full py-2 px-3 rounded-lg text-sm font-medium btn-hover transition-all"
+                            style="background-color: var(--success-color); color: white;">
+                            🗑️ Clear Completed
+                        </button>
+                        <button id="clear-all"
+                            class="w-full py-2 px-3 rounded-lg text-sm font-medium btn-hover transition-all"
+                            style="background-color: var(--danger-color); color: white;">
+                            🚨 Clear All Tasks
+                        </button>
+                        <button id="export-tasks"
+                            class="w-full py-2 px-3 rounded-lg text-sm font-medium btn-hover transition-all"
+                            style="background-color: var(--category-work); color: white;">
+                            📥 Export Tasks
+                        </button>
+                        <button id="import-tasks"
+                            class="w-full py-2 px-3 rounded-lg text-sm font-medium btn-hover transition-all"
+                            style="background-color: var(--category-study); color: white;">
+                            📤 Import Tasks
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tasks List -->
+        <div class="p-6 rounded-xl shadow-sm"
+            style="background-color: var(--bg-secondary); border: 1px solid var(--border-color);">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold flex items-center" style="color: var(--text-primary);">
+                    <span class="mr-2">📝</span> Your Tasks
+                </h2>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm" style="color: var(--text-secondary);">Drag to reorder</span>
+                    <span class="text-lg">↕️</span>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="text-center py-12">
+                <div class="text-6xl mb-4">📝</div>
+                <h3 class="text-xl font-semibold mb-2" style="color: var(--text-primary);">No tasks yet!</h3>
+                <p style="color: var(--text-secondary);">Add your first task above to get started.</p>
+            </div>
+
+            <!-- Tasks Container -->
+            <div id="tasks-container" class="space-y-3 custom-scrollbar max-h-96 overflow-y-auto hidden">
+                <!-- Tasks will be dynamically inserted here -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- User Menu Modal -->
+    <div id="user-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-backdrop absolute inset-0" onclick="closeUserModal()"></div>
+        <div class="relative flex items-center justify-center min-h-screen p-4">
+            <div class="w-full max-w-md p-6 rounded-xl shadow-xl"
+                style="background-color: var(--bg-primary); border: 1px solid var(--border-color);">
+
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold" style="color: var(--text-primary);">User Settings</h3>
+                    <button onclick="closeUserModal()" class="p-1 rounded-lg"
+                        style="color: var(--text-secondary);">✕</button>
+                </div>
+
+                <!-- User Login/Switch -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2"
+                            style="color: var(--text-secondary);">Username</label>
+                        <input type="text" id="username-input"
+                            class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:border-transparent"
+                            style="background-color: var(--bg-secondary); border-color: var(--border-color); color: var(--text-primary); --tw-ring-color: var(--primary-color);"
+                            placeholder="Enter username...">
+                    </div>
+
+                    <button id="login-btn" class="w-full py-2 px-4 rounded-lg font-medium btn-hover"
+                        style="background-color: var(--primary-color); color: var(--text-primary);">
+                        Switch User
+                    </button>
+
+                    <!-- Recent Users -->
+                    <div class="border-t pt-4" style="border-color: var(--border-color);">
+                        <h4 class="font-medium mb-2" style="color: var(--text-primary);">Recent Users</h4>
+                        <div id="recent-users" class="space-y-1">
+                            <!-- Recent users will be listed here -->
+                        </div>
+                        <!-- New Remove All Button -->
+                        <button onclick="removeAllUsers()" class="mt-3 w-full py-2 px-4 rounded-lg font-medium"
+                            style="background-color: crimson; color: white;">
+                            Remove All Users
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="import-file" accept=".json" style="display: none;">
+
+    <script>
+        // ===== GLOBAL VARIABLES =====
+        let tasks = [];
+        let currentUser = 'Guest User';
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let draggedElement = null;
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeApp();
+            loadTheme();
+            loadUser();
+            loadTasks();
+            setupEventListeners();
+            updateStats();
+            updateTasksDisplay();
+
+            // Register service worker for PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('data:text/javascript;base64,c2VsZi5hZGRFdmVudExpc3RlbmVyKCdpbnN0YWxsJywgZXZlbnQgPT4gewogIGV2ZW50LndhaXRVbnRpbChzZWxmLnNraXBXYWl0aW5nKCkpOwp9KTsKCnNlbGYuYWRkRXZlbnRMaXN0ZW5lcignYWN0aXZhdGUnLCBldmVudCA9PiB7CiAgZXZlbnQud2FpdFVudGlsKHNlbGYuY2xpZW50cy5jbGFpbSgpKTsKfSk7');
+            }
+        });
+
+        // ===== CORE FUNCTIONS =====
+        function initializeApp() {
+            // Set default due date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(9, 0, 0, 0);
+            document.getElementById('task-due-date').value = tomorrow.toISOString().slice(0, 16);
+        }
+
+        function setupEventListeners() {
+            // Form submission
+            document.getElementById('task-form').addEventListener('submit', handleAddTask);
+
+            // Search functionality
+            document.getElementById('search-input').addEventListener('input', handleSearch);
+
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', handleFilter);
+            });
+
+            // Quick actions
+            document.getElementById('clear-completed').addEventListener('click', clearCompletedTasks);
+            document.getElementById('clear-all').addEventListener('click', clearAllTasks);
+            document.getElementById('export-tasks').addEventListener('click', exportTasks);
+            document.getElementById('import-tasks').addEventListener('click', () => document.getElementById('import-file').click());
+            document.getElementById('import-file').addEventListener('change', importTasks);
+
+            // Theme toggle
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+            // User menu
+            document.getElementById('user-menu-btn').addEventListener('click', openUserModal);
+            document.getElementById('login-btn').addEventListener('click', switchUser);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', handleKeyboardShortcuts);
+        }
+
+        // ===== TASK MANAGEMENT =====
+        function handleAddTask(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('task-title').value.trim();
+            const description = document.getElementById('task-description').value.trim();
+            const priority = document.getElementById('task-priority').value;
+            const category = document.getElementById('task-category').value;
+            const dueDate = document.getElementById('task-due-date').value;
+
+            if (!title) return;
+
+            const task = {
+                id: Date.now().toString(),
+                title,
+                description,
+                priority,
+                category,
+                dueDate: dueDate ? new Date(dueDate) : null,
+                completed: false,
+                createdAt: new Date(),
+                user: currentUser
+            };
+
+            tasks.unshift(task);
+            saveTasks();
+            updateStats();
+            updateTasksDisplay();
+
+            // Reset form
+            document.getElementById('task-form').reset();
+            initializeApp();
+
+            // Show success animation
+            showNotification('Task added successfully! ✨', 'success');
+        }
+
+        function toggleTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                updateStats();
+                updateTasksDisplay();
+
+                const message = task.completed ? 'Task completed! 🎉' : 'Task marked as pending ⏳';
+                showNotification(message, task.completed ? 'success' : 'info');
+            }
+        }
+
+        function deleteTask(taskId) {
+            if (confirm('Are you sure you want to delete this task?')) {
+                tasks = tasks.filter(t => t.id !== taskId);
+                saveTasks();
+                updateStats();
+                updateTasksDisplay();
+                showNotification('Task deleted 🗑️', 'error');
+            }
+        }
+
+        function editTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                // Fill form with task data
+                document.getElementById('task-title').value = task.title;
+                document.getElementById('task-description').value = task.description || '';
+                document.getElementById('task-priority').value = task.priority;
+                document.getElementById('task-category').value = task.category;
+
+                if (task.dueDate) {
+                    const date = new Date(task.dueDate);
+                    document.getElementById('task-due-date').value = date.toISOString().slice(0, 16);
+                }
+
+                // Remove the task and let user re-add it
+                deleteTask(taskId);
+
+                // Scroll to form
+                document.getElementById('task-form').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('task-title').focus();
+            }
+        }
+
+        // ===== DISPLAY FUNCTIONS =====
+        function updateTasksDisplay() {
+            const container = document.getElementById('tasks-container');
+            const emptyState = document.getElementById('empty-state');
+
+            let filteredTasks = filterTasks();
+
+            if (filteredTasks.length === 0) {
+                container.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            container.innerHTML = filteredTasks.map(task => createTaskHTML(task)).join('');
+
+            // Add drag and drop event listeners
+            setupDragAndDrop();
+        }
+
+        function createTaskHTML(task) {
+            const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && !task.completed;
+            const isDueSoon = task.dueDate && new Date(task.dueDate) <= new Date(Date.now() + 24 * 60 * 60 * 1000) && !task.completed;
+
+            const priorityIcon = {
+                low: '🟢',
+                medium: '🟡',
+                high: '🔴'
+            }[task.priority];
+
+            const categoryIcon = {
+                work: '💼',
+                personal: '🏠',
+                study: '📚'
+            }[task.category];
+
+            const statusClass = task.completed ? 'completed' : (isOverdue ? 'overdue' : (isDueSoon ? 'due-soon' : ''));
+
+            let dueDateHTML = '';
+            if (task.dueDate) {
+                const dueDate = new Date(task.dueDate);
+                const now = new Date();
+                const diffTime = dueDate - now;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                let dueDateText = dueDate.toLocaleDateString();
+                let dueDateIcon = '📅';
+
+                if (isOverdue) {
+                    dueDateText += ' (Overdue)';
+                    dueDateIcon = '🚨';
+                } else if (isDueSoon) {
+                    dueDateText += ' (Due Soon)';
+                    dueDateIcon = '⏰';
+                }
+
+                dueDateHTML = `
+                    <div class="flex items-center text-xs" style="color: var(--text-muted);">
+                        <span class="mr-1">${dueDateIcon}</span>
+                        <span>${dueDateText}</span>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="task-card p-4 rounded-lg shadow-sm ${statusClass} fade-in" 
+                     style="background-color: var(--bg-primary); border: 1px solid var(--border-color);"
+                     draggable="true" data-task-id="${task.id}">
+                    
+                    <!-- Task Header -->
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex items-start space-x-3 flex-1">
+                            <!-- Checkbox -->
+                            <button onclick="toggleTask('${task.id}')" 
+                                    class="mt-1 w-5 h-5 rounded border-2 flex items-center justify-center transition-all"
+                                    style="border-color: var(--primary-color); ${task.completed ? 'background-color: var(--primary-color);' : ''}">
+                                ${task.completed ? '<span class="text-white text-xs">✓</span>' : ''}
+                            </button>
+                            
+                            <!-- Task Content -->
+                            <div class="flex-1">
+                                <h3 class="font-semibold ${task.completed ? 'line-through opacity-60' : ''}" 
+                                    style="color: var(--text-primary);">
+                                    ${highlightSearchTerm(task.title)}
+                                </h3>
+                                
+                                ${task.description ? `
+                                    <p class="text-sm mt-1 ${task.completed ? 'line-through opacity-60' : ''}" 
+                                       style="color: var(--text-secondary);">
+                                        ${highlightSearchTerm(task.description)}
+                                    </p>
+                                ` : ''}
+                                
+                                <!-- Tags -->
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white priority-${task.priority}">
+                                        ${priorityIcon} ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}
+                                    </span>
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white category-${task.category}">
+                                        ${categoryIcon} ${task.category.charAt(0).toUpperCase() + task.category.slice(1)}
+                                    </span>
+                                </div>
+                                
+                                ${dueDateHTML}
+                            </div>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="flex items-center space-x-1 ml-2">
+                            <button onclick="editTask('${task.id}')" 
+                                    class="p-1 rounded hover:bg-opacity-20 transition-all" 
+                                    style="color: var(--text-muted); hover:background-color: var(--primary-color);"
+                                    title="Edit task">
+                                ✏️
+                            </button>
+                            <button onclick="deleteTask('${task.id}')" 
+                                    class="p-1 rounded hover:bg-opacity-20 transition-all" 
+                                    style="color: var(--text-muted); hover:background-color: var(--danger-color);"
+                                    title="Delete task">
+                                🗑️
+                            </button>
+                            <div class="cursor-move p-1" style="color: var(--text-muted);" title="Drag to reorder">
+                                ⋮⋮
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateStats() {
+            const total = tasks.filter(t => t.user === currentUser).length;
+            const completed = tasks.filter(t => t.user === currentUser && t.completed).length;
+            const pending = total - completed;
+            const overdue = tasks.filter(t =>
+                t.user === currentUser &&
+                !t.completed &&
+                t.dueDate &&
+                new Date(t.dueDate) < new Date()
+            ).length;
+
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('completed-count').textContent = completed;
+            document.getElementById('pending-count').textContent = pending;
+            document.getElementById('overdue-count').textContent = overdue;
+
+            // Update progress bar
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            document.getElementById('progress-percentage').textContent = `${percentage}%`;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+        }
+
+        // ===== FILTER AND SEARCH =====
+        function filterTasks() {
+            let filtered = tasks.filter(t => t.user === currentUser);
+
+            // Apply status filter
+            switch (currentFilter) {
+                case 'pending':
+                    filtered = filtered.filter(t => !t.completed);
+                    break;
+                case 'completed':
+                    filtered = filtered.filter(t => t.completed);
+                    break;
+                case 'overdue':
+                    filtered = filtered.filter(t =>
+                        !t.completed &&
+                        t.dueDate &&
+                        new Date(t.dueDate) < new Date()
+                    );
+                    break;
+            }
+
+            // Apply search filter
+            if (searchQuery) {
+                filtered = filtered.filter(t =>
+                    t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    (t.description && t.description.toLowerCase().includes(searchQuery.toLowerCase()))
+                );
+            }
+
+            return filtered;
+        }
+
+        function handleSearch(e) {
+            searchQuery = e.target.value;
+            updateTasksDisplay();
+        }
+
+        function handleFilter(e) {
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.style.backgroundColor = 'var(--bg-primary)';
+                btn.style.color = 'var(--text-secondary)';
+                btn.style.border = '1px solid var(--border-color)';
+            });
+
+            e.target.style.backgroundColor = 'var(--primary-color)';
+            e.target.style.color = 'var(--text-primary)';
+            e.target.style.border = 'none';
+
+            currentFilter = e.target.id.replace('filter-', '');
+            updateTasksDisplay();
+        }
+
+        function highlightSearchTerm(text) {
+            if (!searchQuery) return text;
+
+            const regex = new RegExp(`(${searchQuery})`, 'gi');
+            return text.replace(regex, '<span class="search-highlight">$1</span>');
+        }
+
+        // ===== DRAG AND DROP =====
+        function setupDragAndDrop() {
+            const taskCards = document.querySelectorAll('.task-card');
+
+            taskCards.forEach(card => {
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragover', handleDragOver);
+                card.addEventListener('drop', handleDrop);
+                card.addEventListener('dragend', handleDragEnd);
+            });
+        }
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.target.closest('.task-card')?.classList.add('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const dropTarget = e.target.closest('.task-card');
+
+            if (dropTarget && draggedElement && dropTarget !== draggedElement) {
+                const draggedId = draggedElement.dataset.taskId;
+                const targetId = dropTarget.dataset.taskId;
+
+                // Reorder tasks array
+                const draggedIndex = tasks.findIndex(t => t.id === draggedId);
+                const targetIndex = tasks.findIndex(t => t.id === targetId);
+
+                if (draggedIndex !== -1 && targetIndex !== -1) {
+                    const [draggedTask] = tasks.splice(draggedIndex, 1);
+                    tasks.splice(targetIndex, 0, draggedTask);
+
+                    saveTasks();
+                    updateTasksDisplay();
+                    showNotification('Tasks reordered! 📋', 'info');
+                }
+            }
+
+            document.querySelectorAll('.task-card').forEach(card => {
+                card.classList.remove('drag-over');
+            });
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedElement = null;
+        }
+
+        // ===== BULK ACTIONS =====
+        function clearCompletedTasks() {
+            if (confirm('Are you sure you want to delete all completed tasks?')) {
+                const beforeCount = tasks.length;
+                tasks = tasks.filter(t => t.user !== currentUser || !t.completed);
+                const deletedCount = beforeCount - tasks.length;
+
+                saveTasks();
+                updateStats();
+                updateTasksDisplay();
+                showNotification(`${deletedCount} completed tasks deleted! 🗑️`, 'success');
+            }
+        }
+
+        function clearAllTasks() {
+            if (confirm('Are you sure you want to delete ALL your tasks? This cannot be undone!')) {
+                const beforeCount = tasks.filter(t => t.user === currentUser).length;
+                tasks = tasks.filter(t => t.user !== currentUser);
+
+                saveTasks();
+                updateStats();
+                updateTasksDisplay();
+                showNotification(`All ${beforeCount} tasks deleted! 🚨`, 'error');
+            }
+        }
+
+        // ===== IMPORT/EXPORT =====
+        function exportTasks() {
+            const userTasks = tasks.filter(t => t.user === currentUser);
+            const dataStr = JSON.stringify(userTasks, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `tasks_${currentUser}_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+
+            showNotification('Tasks exported successfully! 📥', 'success');
+        }
+
+        function importTasks(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                try {
+                    const importedTasks = JSON.parse(event.target.result);
+
+                    if (Array.isArray(importedTasks)) {
+                        // Update user for imported tasks
+                        importedTasks.forEach(task => {
+                            task.user = currentUser;
+                            task.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+                        });
+
+                        tasks = [...tasks, ...importedTasks];
+                        saveTasks();
+                        updateStats();
+                        updateTasksDisplay();
+                        showNotification(`${importedTasks.length} tasks imported! 📤`, 'success');
+                    } else {
+                        throw new Error('Invalid file format');
+                    }
+                } catch (error) {
+                    showNotification('Error importing tasks. Please check the file format. ❌', 'error');
+                }
+            };
+            reader.readAsText(file);
+
+            // Reset file input
+            e.target.value = '';
+        }
+
+        // ===== THEME MANAGEMENT =====
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            // Update theme icon
+            const themeIcon = document.getElementById('theme-icon');
+            themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+
+            showNotification(`${newTheme === 'dark' ? 'Dark' : 'Light'} mode activated! ${newTheme === 'dark' ? '🌙' : '☀️'}`, 'info');
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+
+            const themeIcon = document.getElementById('theme-icon');
+            themeIcon.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // ===== USER MANAGEMENT =====
+        function openUserModal() {
+            document.getElementById('user-modal').classList.remove('hidden');
+            document.getElementById('username-input').value = '';
+            loadRecentUsers();
+        }
+
+        function closeUserModal() {
+            document.getElementById('user-modal').classList.add('hidden');
+        }
+
+        function switchUser() {
+            const username = document.getElementById('username-input').value.trim();
+            if (!username) return;
+
+            currentUser = username;
+            localStorage.setItem('currentUser', currentUser);
+            document.getElementById('current-user').textContent = currentUser;
+
+            if (currentUser === "Guest") {
+                tasks = []; // Guest never saves tasks
+            } else {
+                // Load this user's tasks
+                tasks = JSON.parse(localStorage.getItem(`tasks_${currentUser}`) || "[]");
+            }
+
+            // Save to recent users only if not Guest
+            if (currentUser !== "Guest") {
+                let recentUsers = JSON.parse(localStorage.getItem('recentUsers') || '[]');
+                recentUsers = recentUsers.filter(u => u !== username);
+                recentUsers.unshift(username);
+                recentUsers = recentUsers.slice(0, 5);
+                localStorage.setItem('recentUsers', JSON.stringify(recentUsers));
+            }
+
+            updateTasksDisplay();
+            updateStats();
+            closeUserModal();
+            showNotification(`Switched to user: ${currentUser} 👤`, 'info');
+        }
+
+
+
+
+        function loadUser() {
+            currentUser = localStorage.getItem('currentUser') || "Guest";
+            document.getElementById('current-user').textContent = currentUser;
+
+            if (currentUser === "Guest") {
+                tasks = [];
+            } else {
+                tasks = JSON.parse(localStorage.getItem(`tasks_${currentUser}`) || "[]");
+            }
+
+            updateTasksDisplay();
+            updateStats();
+        }
+
+
+        function loadRecentUsers() {
+            const recentUsers = JSON.parse(localStorage.getItem('recentUsers') || '[]');
+            const container = document.getElementById('recent-users');
+            container.innerHTML = "";
+
+            recentUsers.forEach(user => {
+                const btn = document.createElement("button");
+                btn.textContent = `👤 ${user}`;
+                btn.className = "w-full text-left py-1 px-2 rounded hover:bg-opacity-20 transition-all";
+                btn.style.color = "var(--text-secondary)";
+                btn.onclick = () => selectRecentUser(user);
+                container.appendChild(btn);
+            });
+        }
+
+
+        function selectRecentUser(username) {
+            document.getElementById('username-input').value = username;
+        }
+        // Remove all users
+        function removeAllUsers() {
+            // Clear all real users, but keep Guest as default
+            localStorage.setItem("recentUsers", JSON.stringify([]));
+            localStorage.setItem("currentUser", "Guest");
+
+            // Reset tasks for Guest
+            tasks = [];
+
+            // Update UI
+            const recentUsersContainer = document.getElementById("recent-users");
+            if (recentUsersContainer) {
+                recentUsersContainer.innerHTML = "<div>Guest</div>";
+            }
+
+            const currentUserDisplay = document.getElementById("current-user");
+            if (currentUserDisplay) {
+                currentUserDisplay.textContent = "Guest";
+            }
+
+            showNotification("All users removed. Switched to Guest 👤", "info");
+            location.reload();
+
+        }
+
+
+        // ===== STORAGE =====
+        function saveTasks() {
+            if (currentUser === "Guest") {
+                // Do not persist Guest tasks
+                return;
+            }
+            localStorage.setItem(`tasks_${currentUser}`, JSON.stringify(tasks));
+        }
+
+        function loadTasks() {
+            if (currentUser === "Guest") {
+                tasks = []; // Always empty for Guest
+                return;
+            }
+
+            const savedTasks = localStorage.getItem(`tasks_${currentUser}`);
+            if (savedTasks) {
+                tasks = JSON.parse(savedTasks);
+                // Convert date strings back to Date objects if needed
+                tasks.forEach(task => {
+                    if (task.dueDate) task.dueDate = new Date(task.dueDate);
+                    if (task.createdAt) task.createdAt = new Date(task.createdAt);
+                });
+            } else {
+                tasks = [];
+            }
+        }
+
+
+        // ===== KEYBOARD SHORTCUTS =====
+        function handleKeyboardShortcuts(e) {
+            // Ctrl/Cmd + Enter: Add task
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('task-form').dispatchEvent(new Event('submit'));
+            }
+
+            // Ctrl/Cmd + F: Focus search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('search-input').focus();
+            }
+
+            // Escape: Clear search
+            if (e.key === 'Escape') {
+                document.getElementById('search-input').value = '';
+                searchQuery = '';
+                updateTasksDisplay();
+            }
+        }
+
+        // ===== NOTIFICATIONS =====
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg fade-in';
+
+            const colors = {
+                success: 'var(--success-color)',
+                error: 'var(--danger-color)',
+                warning: 'var(--warning-color)',
+                info: 'var(--primary-color)'
+            };
+
+            notification.style.backgroundColor = colors[type];
+            notification.style.color = 'white';
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // ===== PWA INSTALLATION =====
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Show install button or notification
+            showNotification('Install TrackIt for offline access! 📱', 'info');
+        });
+
+        // Auto-save every 30 seconds
+        setInterval(() => {
+            if (tasks.length > 0) {
+                saveTasks();
+            }
+        }, 30000);
+
+        // Welcome message
+        setTimeout(() => {
+            showNotification('Welcome to TrackIt! Start by adding your first task. ✨', 'info');
+        }, 1000);
+    </script>
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'979b5a7e67d0c91f',t:'MTc1Njk2NjUzOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
+
+</html>
